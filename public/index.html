@@ -17,8 +17,8 @@
 
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message { background: white; max-width: 360px; margin: 25px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #175d8e; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
       #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
       #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
       #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
@@ -26,39 +26,70 @@
       #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
       @media (max-width: 600px) {
         body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
       }
     </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js" integrity="sha256-Fh801SO9gqegfUdkDxyzXzIUPWzO/Vatqj8uN+5xcL4=" crossorigin="anonymous"></script>
   </head>
   <body>
     <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+      <h2>Random Question:</h2>
+      <p>Loading...</p>
+      <button class='prev'>Previous Question</button>
+      <button class='next'>Next Question</button>
+      <button class='edit'>Edit Questions</button>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
-
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
-          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+      document.addEventListener('DOMContentLoaded', async () => {
+        const shuffleArray = function(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
         }
+        const docUrl = 'https://docs.google.com/spreadsheets/d/1R9d86T_Uy-XxxHwEocRnyngSF7lqosQUewSBR7-9In8/'
+        const response = await fetch(docUrl + 'export?format=csv')
+        const csv = Papa.parse(await response.text())
+        const rows = csv.data
+        shuffleArray(rows)
+
+        const question = document.querySelector('#message p')
+        const prevButton = document.querySelector('#message button.prev')
+        const nextButton = document.querySelector('#message button.next')
+        const editButton = document.querySelector('#message button.edit')
+        
+        let index = 0
+        const showQuestion = function(){
+          if(index < 0){
+            index = 0
+          }
+          
+          if(index < rows.length){
+            question.innerHTML = rows[index][0]
+          }
+          else{
+            index = rows.length
+            question.innerHTML = "You've gone through all the questions!"
+          }
+        }
+
+        showQuestion()
+
+        prevButton.addEventListener('click', () => {
+          index--
+          showQuestion()
+        })
+
+        nextButton.addEventListener('click', () => {
+          index++
+          showQuestion()
+        })
+
+        editButton.addEventListener('click', () => {
+          open(docUrl, '_blank')
+        })
       });
     </script>
   </body>
