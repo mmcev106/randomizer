@@ -27,69 +27,65 @@
       @media (max-width: 600px) {
         body, #message { margin-top: 0; background: white; box-shadow: none; }
       }
+
+      .indented{
+        margin-top: 10px;
+        margin-left: 15px;
+      }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js" integrity="sha256-Fh801SO9gqegfUdkDxyzXzIUPWzO/Vatqj8uN+5xcL4=" crossorigin="anonymous"></script>
   </head>
   <body>
     <div id="message">
-      <h2>Random Question:</h2>
+      <h2>Random Question: <button class='next'>Next Question</button></h2>
       <p>Loading...</p>
-      <button class='prev'>Previous Question</button>
-      <button class='next'>Next Question</button>
-      <button class='edit'>Edit Questions</button>
     </div>
     <script>
       document.addEventListener('DOMContentLoaded', async () => {
-        const shuffleArray = function(array) {
-            for (var i = array.length - 1; i > 0; i--) {
-                var j = Math.floor(Math.random() * (i + 1));
-                var temp = array[i];
-                array[i] = array[j];
-                array[j] = temp;
-            }
-        }
-        const docUrl = 'https://docs.google.com/spreadsheets/d/1R9d86T_Uy-XxxHwEocRnyngSF7lqosQUewSBR7-9In8/'
-        const response = await fetch(docUrl + 'export?format=csv')
-        const csv = Papa.parse(await response.text())
-        const rows = csv.data
-        shuffleArray(rows)
+        const docUrl = 'https://docs.google.com/document/u/0/export?format=txt&id=14fMV1X8opeZpdLSNSnrdnFyYFGDRS5Qlmvz56HHbN-Q&token=AC4w5VgbUny_s-FORIXvxauc7h2ywYVAeQ%3A1575128391164&ouid=110439473659985984306&includes_info_params=true'
+        const response = await fetch(docUrl)
+        const text = await response.text()
+        const lines = text.split('\n')
+        const questions = []
+
+        let nextQuestionNumber = 1
+        let done = false
+        lines.forEach((line) => {
+          line = line.trim()
+
+          if(line.includes('________________')){
+            done = true
+          }
+
+          if(done || line === ''){
+            return
+          }
+
+          const parts = line.split('.')
+          const questionNumber = parseInt(parts.shift())
+          
+          if(questionNumber === nextQuestionNumber){
+            questions.push(parts.join('.'))
+            nextQuestionNumber++
+          }
+          else if(nextQuestionNumber > 1){
+            questions[questions.length-1] += '<div class="indented">' + line + '</div>'
+          }
+        })
 
         const question = document.querySelector('#message p')
-        const prevButton = document.querySelector('#message button.prev')
         const nextButton = document.querySelector('#message button.next')
-        const editButton = document.querySelector('#message button.edit')
         
-        let index = 0
         const showQuestion = function(){
-          if(index < 0){
-            index = 0
-          }
-          
-          if(index < rows.length){
-            question.innerHTML = rows[index][0]
-          }
-          else{
-            index = rows.length
-            question.innerHTML = "You've gone through all the questions!"
-          }
+          const index = Math.floor(Math.random() * questions.length)
+          console.log('Question Number ' + (index+1))
+          question.innerHTML = questions[index]
         }
 
         showQuestion()
 
-        prevButton.addEventListener('click', () => {
-          index--
-          showQuestion()
-        })
-
-        nextButton.addEventListener('click', () => {
-          index++
-          showQuestion()
-        })
-
-        editButton.addEventListener('click', () => {
-          open(docUrl, '_blank')
-        })
+        nextButton.addEventListener('click', showQuestion)
       });
     </script>
   </body>
