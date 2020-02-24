@@ -36,10 +36,16 @@
         const params = new URLSearchParams(location.search)
 
         // The URL class and other URL parsers seem to struggle with urls as parameters if they contain question marks.
-        const docUrl = location.search.split('source=')[1]
+        let docUrl = location.search.split('source=')[1]
         if(!docUrl){
           document.querySelector('#message').innerHTML = 'You must specify a "source" url parameter.'
           return
+        }
+
+        if(docUrl.startsWith('https://docs.google.com/document/d/')){
+          const parts = docUrl.split('/')
+          const docId = parts[5]
+          docUrl = 'https://docs.google.com/document/u/0/export?format=txt&id=' + docId + '&includes_info_params=true'
         }
 
         const response = await fetch(docUrl)
