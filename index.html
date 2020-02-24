@@ -3,17 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
-
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/7.5.0/firebase-app.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/7.5.0/firebase-auth.js"></script>
-    <script defer src="/__/firebase/7.5.0/firebase-database.js"></script>
-    <script defer src="/__/firebase/7.5.0/firebase-messaging.js"></script>
-    <script defer src="/__/firebase/7.5.0/firebase-storage.js"></script>
-    <!-- initialize the SDK after all desired features are loaded -->
-    <script defer src="/__/firebase/init.js"></script>
+    <title>Randomizer</title>
 
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
@@ -42,8 +32,16 @@
       <p>Loading...</p>
     </div>
     <script>
-      document.addEventListener('DOMContentLoaded', async () => {
-        const docUrl = 'https://docs.google.com/document/u/0/export?format=txt&id=14fMV1X8opeZpdLSNSnrdnFyYFGDRS5Qlmvz56HHbN-Q&token=AC4w5VgbUny_s-FORIXvxauc7h2ywYVAeQ%3A1575128391164&ouid=110439473659985984306&includes_info_params=true'
+      window.addEventListener('load', async () => {
+        const params = new URLSearchParams(location.search)
+
+        // The URL class and other URL parsers seem to struggle with urls as parameters if they contain question marks.
+        const docUrl = location.search.split('source=')[1]
+        if(!docUrl){
+          document.querySelector('#message').innerHTML = 'You must specify a "source" url parameter.'
+          return
+        }
+
         const response = await fetch(docUrl)
         const text = await response.text()
         const lines = text.split('\n')
