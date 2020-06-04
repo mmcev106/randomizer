@@ -33,12 +33,29 @@
     </div>
     <script>
       window.addEventListener('load', async () => {
+        const message = document.querySelector('#message')
+        if(location.protocol === 'file:'){
+          // 
+          message.innerHTML = `
+            This page won't work unless loaded from a web server.
+            Most interpreted languages include a basic web server
+            which can be used for local development.
+            For example:
+            <ul>
+              <li>python -m SimpleHTTPServer</li>
+              <li>php -S localhost:8080</li>
+            </ul>
+          `
+
+          return
+        }
+
         const params = new URLSearchParams(location.search)
 
         // The URL class and other URL parsers seem to struggle with urls as parameters if they contain question marks.
         let docUrl = location.search.split('source=')[1]
         if(!docUrl){
-          document.querySelector('#message').innerHTML = 'You must specify a "source" url parameter.'
+          message.innerHTML = 'You must specify a "source" url parameter.'
           return
         }
 
