@@ -87,9 +87,6 @@
       const Randomizer = {
         parseQuestions: (lines) => {
           if(lines[0].startsWith('* ')){
-            // Google doc exports indent all lines except the first with three spaces.
-            // Indent the first as well for easy parsing.
-            lines[0] = '   ' + lines[0]
             return Randomizer.parseAsteriskOutline(lines)
           }
           else{
