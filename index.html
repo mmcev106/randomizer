@@ -98,7 +98,6 @@
           lines.forEach((line) => {
             let asteriskIndex = line.indexOf('*')
             var indentation = line.substring(0, asteriskIndex).split('   ')
-            indentation.pop()
 
             var html = indentation.join('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;') + '• ' + line.substring(asteriskIndex+1)
             
