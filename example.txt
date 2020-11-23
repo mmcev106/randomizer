@@ -1,0 +1,7 @@
+List of Animals
+
+1. Elephant
+2. Zebra
+3. Hippo
+4. Chimpanzee
+5. Newt
